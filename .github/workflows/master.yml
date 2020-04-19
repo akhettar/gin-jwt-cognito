@@ -25,7 +25,7 @@ jobs:
     - name: Build and Run test
       run: |
         echo Running all the tests
-        go -v test
+        go test
 
     - name: Bump version and push tag
       uses: anothrNick/github-tag-action@1.17.2
