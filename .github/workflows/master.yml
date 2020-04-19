@@ -26,11 +26,15 @@ jobs:
       run: |
         echo Running all the tests
         go test
-
     - name: Bump version and push tag
       uses: anothrNick/github-tag-action@1.17.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         WITH_V: true
+
+    - name: Publish the package to go.dev package
+      run: |
+        export latest="$(git describe --tags `git rev-list --tags --max-count=1`)"
+        curl https://proxy.golang.org/github.com/akhettar/gin-jwt-cognito/@v/$latest.info
 
 

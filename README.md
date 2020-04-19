@@ -1,6 +1,6 @@
 # Gin Cognito JWT Authentication Middleware 
 ![Master CI](https://github.com/akhettar/gin-jwt-cognito/workflows/Master%20CI/badge.svg)
-[![GoDoc](https://godoc.org/github.com/devopsfaith/krakend?)
+[![GoDoc](https://godoc.org/github.com/akhettar/gin-jwt-cognito?)
 
 ![Gin](gin.png)
 
@@ -47,3 +47,6 @@ func main() {
 }
 
 ```
+
+# License
+[MIT](LICENSE)
