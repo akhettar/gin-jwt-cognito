@@ -17,7 +17,7 @@ const (
 func TestMissingAuthrisationHeader(t *testing.T) {
 	t.Logf("Given the authorization header is not set")
 	{
-		middleware, _ := CognitoJWTMiddleware()
+		middleware := AuthMiddleware{UserPoolID: "some_user_id_pool", Region: "some_region"}
 		emptyMap := http.Header{}
 		request := http.Request{Header: emptyMap}
 		ctx := gin.Context{Request: &request}
@@ -36,7 +36,7 @@ func TestMissingAuthrisationHeader(t *testing.T) {
 func TestCognitoTokenExpiredShouldResultInUnauthorisedError(t *testing.T) {
 	t.Logf("Given the middleWareImpl method has been invoked with  an expired token")
 	{
-		middleware, _ := CognitoJWTMiddleware()
+		middleware := &AuthMiddleware{UserPoolID: "some_user_id_pool", Region: "some_region"}
 
 		handler := ginHandler(middleware)
 
@@ -56,30 +56,6 @@ func TestCognitoTokenExpiredShouldResultInUnauthorisedError(t *testing.T) {
 			})
 	}
 }
-
-//func TestTokenWithInvalidIssuerShouldResultInUnauthorisedError(t *testing.T) {
-//	t.Logf("Given the middleWareImpl method has been invoked with an invalid token: issuer is not valid")
-//	{
-//		middleware := CognitoJWTMiddleware()
-//
-//		handler := ginHandler(middleware)
-//
-//		r := gofight.New()
-//
-//		r.GET("/auth/list").
-//			SetHeader(gofight.H{
-//				AuthorizationHeader: ValidToken,
-//			}).
-//			Run(handler, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
-//
-//				if r.Code == http.StatusUnauthorized {
-//					t.Logf("\t\t The http response status code should be %d. %v", r.Code, CheckMark)
-//				} else {
-//					t.Errorf("\t\t The http response status code should be %d but got %d. %v", http.StatusUnauthorized, r.Code, BallotX)
-//				}
-//			})
-//	}
-//}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //																HELPER FUNCTIONS

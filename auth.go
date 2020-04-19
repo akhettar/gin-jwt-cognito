@@ -78,8 +78,8 @@ type AuthMiddleware struct {
 	JWK map[string]JWKKey
 }
 
-// ErrorResponse Default error response if not present
-type ErrorResponse struct {
+// AuthError auth error response
+type AuthError struct {
 	Message string `json:"message"`
 	Code    int    `json:code`
 }
@@ -101,14 +101,13 @@ func (mw *AuthMiddleware) MiddlewareInit() {
 
 	if mw.Unauthorized == nil {
 		mw.Unauthorized = func(c *gin.Context, code int, message string) {
-			c.JSON(code, ErrorResponse{Code: code, Message: message})
+			c.JSON(code, AuthError{Code: code, Message: message})
 		}
 	}
 
 	if mw.Realm == "" {
 		mw.Realm = "gin jwt"
 	}
-
 }
 
 func (mw *AuthMiddleware) middlewareImpl(c *gin.Context) {
@@ -161,7 +160,7 @@ func (mw *AuthMiddleware) unauthorized(c *gin.Context, code int, message string)
 	return
 }
 
-// MiddlewareFunc makes CognitoJWTMiddleware implement the Middleware interface.
+// MiddlewareFunc implements the Middleware interface.
 func (mw *AuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 	// initialise
 	mw.MiddlewareInit()
@@ -171,8 +170,8 @@ func (mw *AuthMiddleware) MiddlewareFunc() gin.HandlerFunc {
 	}
 }
 
-// CognitoJWTMiddleware create an instance of JWTAuthMiddleware
-func CognitoJWTMiddleware(iss, userPoolID, region string, error interface{}) (*AuthMiddleware, error) {
+// AuthJWTMiddleware create an instance of the middle ware function
+func AuthJWTMiddleware(iss, userPoolID, region string) (*AuthMiddleware, error) {
 
 	// Download the public json web key for the given user pool ID at the start of the plugin
 	jwk, err := getJWK(fmt.Sprintf("https://cognito-idp.%v.amazonaws.com/%v/.well-known/jwks.json", region, userPoolID))
@@ -184,7 +183,7 @@ func CognitoJWTMiddleware(iss, userPoolID, region string, error interface{}) (*A
 		Timeout: time.Hour,
 
 		Unauthorized: func(c *gin.Context, code int, message string) {
-			c.JSON(code, error)
+			c.JSON(code, AuthError{Code: code, Message: message})
 		},
 
 		// Token header
@@ -369,11 +368,4 @@ func getJWK(jwkURL string) (map[string]JWKKey, error) {
 		jwkMap[jwk.Kid] = jwk
 	}
 	return jwkMap, nil
-}
-
-func main() {
-
-	// custom auth error response
-
-	mw, err := CognitoJWTMiddleware("aws_issuer", "some_user_pool_id", "region")
 }
