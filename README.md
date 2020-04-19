@@ -1,6 +1,7 @@
 # Gin Cognito JWT Authentication Middleware 
 ![Master CI](https://github.com/akhettar/gin-jwt-cognito/workflows/Master%20CI/badge.svg)
-[![GoDoc](https://godoc.org/github.com/akhettar/gin-jwt-cognito?)
+![GoDoc](https://godoc.org/github.com/akhettar/gin-jwt-cognito?status.svg)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/034105613f514f4b94c52c62c323101b)](https://www.codacy.com/manual/akhettar/gin-jwt-cognito?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=akhettar/gin-jwt-cognito&amp;utm_campaign=Badge_Grade)
 
 ![Gin](gin.png)
 
