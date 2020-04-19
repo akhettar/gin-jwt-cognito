@@ -1,10 +1,10 @@
 package jwt
 
 import (
-	"github.com/appleboy/gofight/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -14,7 +14,7 @@ const (
 	BallotX             = "\u2717"
 )
 
-func TestMissingAuthrisationHeader(t *testing.T) {
+func Test_MissingAuthorizationHeader(t *testing.T) {
 	t.Logf("Given the authorization header is not set")
 	{
 		middleware := AuthMiddleware{UserPoolID: "some_user_id_pool", Region: "some_region"}
@@ -33,39 +33,34 @@ func TestMissingAuthrisationHeader(t *testing.T) {
 	}
 }
 
-func TestCognitoTokenExpiredShouldResultInUnauthorisedError(t *testing.T) {
+func Test_CognitoTokenExpiredShouldResultInUnauthorisedError(t *testing.T) {
 	t.Logf("Given the middleWareImpl method has been invoked with  an expired token")
 	{
 		middleware := &AuthMiddleware{UserPoolID: "some_user_id_pool", Region: "some_region"}
 
-		handler := ginHandler(middleware)
+		router := ginHandler(middleware)
 
-		r := gofight.New()
+		// Perform a GET request with that handler.
+		response := performRequest(router, "GET", "/auth/list", ExpiredCognitoToken)
 
-		r.GET("/auth/list").
-			SetHeader(gofight.H{
-				AuthorizationHeader: ExpiredCognitoToken,
-			}).
-			Run(handler, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
+		if response.Code == http.StatusUnauthorized {
+			t.Logf("\t\t The http response status code should be %d. %v", response.Code, CheckMark)
+		} else {
+			t.Errorf("\t\t The http response status code should be %d but got %d. %v", http.StatusUnauthorized, response.Code, BallotX)
+		}
 
-				if r.Code == http.StatusUnauthorized {
-					t.Logf("\t\t The http response status code should be %d. %v", r.Code, CheckMark)
-				} else {
-					t.Errorf("\t\t The http response status code should be %d but got %d. %v", http.StatusUnauthorized, r.Code, BallotX)
-				}
-			})
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//																HELPER FUNCTIONS
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-func request(token string, organisationID string) http.Request {
+func performRequest(r http.Handler, method, path string, token string) *httptest.ResponseRecorder {
 	headers := http.Header{}
 	headers.Add(AuthorizationHeader, token)
-	request := http.Request{Header: headers}
-	return request
+	req, _ := http.NewRequest(method, path, nil)
+	req.Header = headers
+
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	return w
 }
 
 // Helper for Handler
