@@ -1,4 +1,4 @@
-module github.com/akhettar/jwt-go
+module github.com/akhettar/gin-jwt-cognito
 
 go 1.14
 

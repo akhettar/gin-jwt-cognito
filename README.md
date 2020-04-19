@@ -20,9 +20,6 @@ import (
     "github.com/akhettar/gin-jwt-cognito"
 )
 
-	
-
-// Use AuthMiddleware type:
 func main() {
 
 	// Creates a gin router with default middleware:
