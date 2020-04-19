@@ -6,7 +6,7 @@
 ![Gin](gin.png)
 
 
-This is a JWT auth [Gin Middleware](https://github.com/gin-gonic/gin) to validate JWT token issued by [AWS Cognito identity manager](https://aws.amazon.com/cognito/). The implementation of this middleware is based 
+This is a JWT auth [Gin](https://github.com/gin-gonic/gin) middleware to validate JWT token issued by [AWS Cognito identity manager](https://aws.amazon.com/cognito/). The implementation of this middleware is based 
 on the [AWS documentation on how to verify the JWT token](https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html)
 
 
