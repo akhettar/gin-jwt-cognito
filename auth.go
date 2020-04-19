@@ -38,9 +38,6 @@ const (
 	// HEADER used by the JWT middle ware
 	HEADER = "header"
 
-	// CognitoIssuserRegex all cognito issuer wil conform to the regex pattern below
-	CognitoIssuserRegex = `(https:\/\/cognito-idp.)(.*)(.amazonaws.com\/)(.*)`
-
 	// IssuerFieldName the issuer field name
 	IssuerFieldName = "iss"
 )
@@ -76,6 +73,21 @@ type AuthMiddleware struct {
 
 	// JWK public JSON Web Key (JWK) for your user pool
 	JWK map[string]JWKKey
+}
+
+// JWK is json data struct for JSON Web Key
+type JWK struct {
+	Keys []JWKKey
+}
+
+// JWKKey is json data struct for cognito jwk key
+type JWKKey struct {
+	Alg string
+	E   string
+	Kid string
+	Kty string
+	N   string
+	Use string
 }
 
 // AuthError auth error response
@@ -310,7 +322,6 @@ func validateExpired(claims jwt2.MapClaims) error {
 	return errors.New("token is expired")
 }
 
-// https://gist.github.com/MathieuMailhos/361f24316d2de29e8d41e808e0071b13
 func convertKey(rawE, rawN string) *rsa.PublicKey {
 	decodedE, err := base64.RawURLEncoding.DecodeString(rawE)
 	if err != nil {
@@ -331,21 +342,6 @@ func convertKey(rawE, rawN string) *rsa.PublicKey {
 	}
 	pubKey.N.SetBytes(decodedN)
 	return pubKey
-}
-
-// JWK is json data struct for JSON Web Key
-type JWK struct {
-	Keys []JWKKey
-}
-
-// JWKKey is json data struct for cognito jwk key
-type JWKKey struct {
-	Alg string
-	E   string
-	Kid string
-	Kty string
-	N   string
-	Use string
 }
 
 // Download the json web public key for the given user pool id
