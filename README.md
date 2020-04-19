@@ -15,54 +15,28 @@ Here is an example of how can this be invoked. It should be attached to all endp
 package main
 
 import (
-    "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
     "github.com/akhettar/gin-jwt-cognito"
 )
 
-// Custom Error response
-type ErrorResponse struct {
-	Message string `json:"message"`
-	Code    int    `json:code`
-}
-
 func main() {
 
 	// Creates a gin router with default middleware:
-	// logger and recovery (crash-free) middleware
 	router := gin.Default()
     
-    mw := jwt.GinJWTMiddleware()
+    // Create Cognito JWT auth middleware and set it  in all authenticated endpoints
+    mw, err := jwt.AuthJWTMiddleware("<some_iss>", "<some_userpool_id>", "region")
+   	if err != nil {
+   		panic(err)
+   	}
 
-
-
-	router.GET("/someGet", getting)
-	router.POST("/somePost", posting)
-	router.PUT("/somePut", putting)
+	router.GET("/someGet", mw, getting)
+	router.POST("/somePost", mw, posting)
+	router.PUT("/somePut", mw, putting)
 	
 	// By default it serves on :8080 unless a
 	// PORT environment variable was defined.
 	router.Run()
 	// router.Run(":3000") for a hard coded port
 }
-
-
-// Registers all the routes
-func  {
-
-	// Create router
-	router := gin.New()
-	router.Use(logger.Logger())
-	router.Use(gin.Recovery())
-
-	router.GET("/tags", jwt.GinJWTMiddleware().MiddlewareFunc(), handler.GetAllTags)
-	router.GET("/tags/:id", jwt.GinJWTMiddleware().MiddlewareFunc(), handler.GetTag)
-	router.DELETE("/tags/:id", jwt.GinJWTMiddleware().MiddlewareFunc(), handler.DeleteTag)
-	router.GET("/health", handler.Health)
-	router.POST("/tags", jwt.GinJWTMiddleware().MiddlewareFunc(), handler.CreateTag)
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	return router
-}
-
 ```
