@@ -3,8 +3,8 @@ module github.com/akhettar/gin-jwt-cognito
 go 1.17
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.4
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/stretchr/testify v1.7.0
 )
 

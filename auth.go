@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	jwt2 "github.com/dgrijalva/jwt-go"
+	jwtgo "github.com/golang-jwt/jwt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"math/big"
@@ -209,13 +209,13 @@ func AuthJWTMiddleware(iss, userPoolID, region string) (*AuthMiddleware, error) 
 	return authMiddleware, nil
 }
 
-func (mw *AuthMiddleware) parse(tokenStr string) (*jwt2.Token, error) {
+func (mw *AuthMiddleware) parse(tokenStr string) (*jwtgo.Token, error) {
 
 	// 1. Decode the token string into JWT format.
-	token, err := jwt2.Parse(tokenStr, func(token *jwt2.Token) (interface{}, error) {
+	token, err := jwtgo.Parse(tokenStr, func(token *jwtgo.Token) (interface{}, error) {
 
 		// cognito user pool : RS256
-		if _, ok := token.Method.(*jwt2.SigningMethodRSA); !ok {
+		if _, ok := token.Method.(*jwtgo.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
@@ -237,7 +237,7 @@ func (mw *AuthMiddleware) parse(tokenStr string) (*jwt2.Token, error) {
 		return token, err
 	}
 
-	claims := token.Claims.(jwt2.MapClaims)
+	claims := token.Claims.(jwtgo.MapClaims)
 
 	iss, ok := claims["iss"]
 	if !ok {
@@ -258,7 +258,7 @@ func (mw *AuthMiddleware) parse(tokenStr string) (*jwt2.Token, error) {
 }
 
 // validateAWSJwtClaims validates AWS Cognito User Pool JWT
-func validateAWSJwtClaims(claims jwt2.MapClaims, region, userPoolID string) error {
+func validateAWSJwtClaims(claims jwtgo.MapClaims, region, userPoolID string) error {
 	var err error
 	// 3. Check the iss claim. It should match your user pool.
 	issShoudBe := fmt.Sprintf("https://cognito-idp.%v.amazonaws.com/%v", region, userPoolID)
@@ -294,7 +294,7 @@ func validateAWSJwtClaims(claims jwt2.MapClaims, region, userPoolID string) erro
 	return nil
 }
 
-func validateClaimItem(key string, keyShouldBe []string, claims jwt2.MapClaims) error {
+func validateClaimItem(key string, keyShouldBe []string, claims jwtgo.MapClaims) error {
 	if val, ok := claims[key]; ok {
 		if valStr, ok := val.(string); ok {
 			for _, shouldbe := range keyShouldBe {
@@ -307,7 +307,7 @@ func validateClaimItem(key string, keyShouldBe []string, claims jwt2.MapClaims) 
 	return fmt.Errorf("%v does not match any of valid values: %v", key, keyShouldBe)
 }
 
-func validateExpired(claims jwt2.MapClaims) error {
+func validateExpired(claims jwtgo.MapClaims) error {
 	if tokenExp, ok := claims["exp"]; ok {
 		if exp, ok := tokenExp.(float64); ok {
 			now := time.Now().Unix()
